@@ -101,6 +101,7 @@ extension DeviceTransferService: MCSessionDelegate {
             // When the old device receives the done message from the new device,
             // it can be confident that the transfer has completed successfully and
             // clear out all data from this device. This will crash the app.
+            // TODO - Optimal UX ??
             if !DebugFlags.deviceTransferPreserveOldDevice {
                 SignalApp.resetAppData()
             }
@@ -157,7 +158,8 @@ extension DeviceTransferService: MCSessionDelegate {
             } catch {
                 owsFail("Restore failed. Will try again on next launch. Error: \(error)")
             }
-
+            
+            // Figure out best place to update payments state from DB.
             firstly(on: .main) { () -> Guarantee<Void> in
                 // A successful restoration means we've updated our database path.
                 // Extensions will learn of this through NSUserDefaults KVO and exit ASAP
