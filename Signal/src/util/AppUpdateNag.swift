@@ -35,7 +35,7 @@ class AppUpdateNag: NSObject {
             return
         }
         
-        guard true else { return }
+        guard false else { return }
 //        guard FeatureFlags.ignoreAppStoreVersionNag == false else { return }
 
         firstly {
