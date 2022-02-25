@@ -121,18 +121,40 @@ public class PaymentsHelperImpl: NSObject, PaymentsHelperSwift {
 
     public func enablePayments(withPaymentsEntropy newPaymentsEntropy: Data, transaction: SDSAnyWriteTransaction) -> Bool {
         let oldPaymentsEntropy = Self.loadPaymentsState(transaction: transaction).paymentsEntropy
-        guard oldPaymentsEntropy == nil || oldPaymentsEntropy == newPaymentsEntropy else {
-            owsFailDebug("paymentsEntropy is already set.")
-            return false
+        if oldPaymentsEntropy == nil || oldPaymentsEntropy == newPaymentsEntropy {
+            Logger.verbose("Setting New Payments Entropy")
+            let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
+                                                    paymentsEntropy: newPaymentsEntropy)
+            owsAssertDebug(paymentsState.isEnabled)
+            setPaymentsState(paymentsState,
+                             originatedLocally: true,
+                             transaction: transaction)
+            owsAssertDebug(arePaymentsEnabled)
+            return true
+        } else {
+            Logger.verbose("Old Payments Entropy Exists !!")
+            let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
+                                                    paymentsEntropy: oldPaymentsEntropy)
+            owsAssertDebug(paymentsState.isEnabled)
+            setPaymentsState(paymentsState,
+                             originatedLocally: true,
+                             transaction: transaction)
+            owsAssertDebug(arePaymentsEnabled)
+            return true
         }
-        let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
-                                                paymentsEntropy: newPaymentsEntropy)
-        owsAssertDebug(paymentsState.isEnabled)
-        setPaymentsState(paymentsState,
-                         originatedLocally: true,
-                         transaction: transaction)
-        owsAssertDebug(arePaymentsEnabled)
-        return true
+//        guard oldPaymentsEntropy == nil || oldPaymentsEntropy == newPaymentsEntropy else {
+//            owsFailDebug("paymentsEntropy is already set.")
+//            return false
+//        }
+        
+//        let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
+//                                                paymentsEntropy: newPaymentsEntropy)
+//        owsAssertDebug(paymentsState.isEnabled)
+//        setPaymentsState(paymentsState,
+//                         originatedLocally: true,
+//                         transaction: transaction)
+//        owsAssertDebug(arePaymentsEnabled)
+//        return true
     }
 
     public func disablePayments(transaction: SDSAnyWriteTransaction) {
