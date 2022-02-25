@@ -10,7 +10,7 @@ public class TSConstants: NSObject {
     private enum Environment {
         case production, staging
     }
-    private static var environment: Environment = .production
+    private static var environment: Environment = .staging
 
     @objc
     public static var isUsingProductionService: Bool {

@@ -35,7 +35,8 @@ class AppUpdateNag: NSObject {
             return
         }
         
-        guard FeatureFlags.ignoreAppStoreVersionNag == false else { return }
+        guard true else { return }
+//        guard FeatureFlags.ignoreAppStoreVersionNag == false else { return }
 
         firstly {
             self.versionService.fetchLatestVersion(lookupURL: lookupURL)
