@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import SignalServiceKit
 
 @objc
 class AppUpdateNag: NSObject {
@@ -33,20 +34,22 @@ class AppUpdateNag: NSObject {
             owsFailDebug("appStoreURL was unexpectedly nil")
             return
         }
+        
+        guard FeatureFlags.ignoreAppStoreVersionNag == false else { return }
 
-//        firstly {
-//            self.versionService.fetchLatestVersion(lookupURL: lookupURL)
-//        }.done { appStoreRecord in
-//            guard appStoreRecord.version.compare(currentVersion, options: .numeric) == ComparisonResult.orderedDescending else {
-//                Logger.debug("remote version: \(appStoreRecord) is not newer than currentVersion: \(currentVersion)")
-//                return
-//            }
-//
-//            Logger.info("new version available: \(appStoreRecord)")
-//            self.showUpdateNagIfEnoughTimeHasPassed(appStoreRecord: appStoreRecord)
-//        }.catch { error in
-//            Logger.warn("failed with error: \(error)")
-//        }
+        firstly {
+            self.versionService.fetchLatestVersion(lookupURL: lookupURL)
+        }.done { appStoreRecord in
+            guard appStoreRecord.version.compare(currentVersion, options: .numeric) == ComparisonResult.orderedDescending else {
+                Logger.debug("remote version: \(appStoreRecord) is not newer than currentVersion: \(currentVersion)")
+                return
+            }
+
+            Logger.info("new version available: \(appStoreRecord)")
+            self.showUpdateNagIfEnoughTimeHasPassed(appStoreRecord: appStoreRecord)
+        }.catch { error in
+            Logger.warn("failed with error: \(error)")
+        }
     }
 
     // MARK: - Internal
